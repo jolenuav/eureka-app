@@ -19,9 +19,6 @@ export default function OptionLogin({ navigation }: any) {
       flex: 1,
     },
   });
-  const helloWorld = () => {
-    navigation.navigate(RouterNavs.LOGIN, { form: 'Login' });
-  };
 
   return (
     <ContainerGradient
@@ -35,7 +32,12 @@ export default function OptionLogin({ navigation }: any) {
         />
         <Text style={StylesGeneral.text}>Continuar con</Text>
 
-        <TouchableHighlight onPress={helloWorld} underlayColor='transparent'>
+        <TouchableHighlight
+          onPress={() => {
+            navigation.navigate(RouterNavs.LOGIN);
+          }}
+          underlayColor='transparent'
+        >
           <View style={styles.textGoogle}>
             <AntDesign
               style={{ marginTop: 10 }}
@@ -51,10 +53,12 @@ export default function OptionLogin({ navigation }: any) {
 
         <TouchableHighlight
           style={{ marginTop: 100 }}
-          onPress={helloWorld}
+          onPress={() => {
+            navigation.navigate(RouterNavs.REGISTER);
+          }}
           underlayColor='transparent'
         >
-          <Text style={StylesGeneral.link}>Registrate</Text>
+          <Text style={StylesGeneral.link}>Regístrate</Text>
         </TouchableHighlight>
 
         <View style={{ marginTop: 10, flexDirection: 'row' }}>
@@ -62,7 +66,12 @@ export default function OptionLogin({ navigation }: any) {
             ¿Ya tienes una cuenta?
           </Text>
 
-          <TouchableHighlight onPress={helloWorld} underlayColor='transparent'>
+          <TouchableHighlight
+            onPress={() => {
+              navigation.navigate(RouterNavs.LOGIN);
+            }}
+            underlayColor='transparent'
+          >
             <Text style={StylesGeneral.link}>Iniciar sesión</Text>
           </TouchableHighlight>
         </View>

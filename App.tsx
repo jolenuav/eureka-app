@@ -10,6 +10,7 @@ import _loadFonts from './app/resources/fonts/LoadFonts';
 import Loading from './app/screens/Loading';
 import Login from './app/screens/Login';
 import OptionLogin from './app/screens/OptionLogin';
+import Register from './app/screens/Register';
 
 const Stack = createStackNavigator();
 LogBox.ignoreLogs(['Setting a timer for a long period of time, i.e. multiple minutes'])
@@ -26,7 +27,7 @@ export default function App() {
 
   if (showLoading) {
     return <Loading />;
-  } else {
+  } else { 
     return (
       <NavigationContainer>
         <Stack.Navigator headerMode='none'>
@@ -35,6 +36,7 @@ export default function App() {
             component={OptionLogin}
           />
           <Stack.Screen name={RouterNavs.LOGIN} component={Login} />
+          <Stack.Screen name={RouterNavs.REGISTER} component={Register} />
         </Stack.Navigator>
       </NavigationContainer>
     );

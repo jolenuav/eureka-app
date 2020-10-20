@@ -5,7 +5,13 @@ import {
 } from '@expo/vector-icons';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Dimensions, StyleSheet, Text, TouchableHighlight } from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+} from 'react-native';
 import { View } from 'react-native-animatable';
 import { TextInput } from 'react-native-gesture-handler';
 import { color } from 'react-native-reanimated';
@@ -16,19 +22,37 @@ import Colors from '../styles/Colors';
 import StylesGeneral from '../styles/General';
 import Loading from './Loading';
 
-export default function Login({ navigation }: any) {
+export default function Register({ navigation }: any) {
   const { control, handleSubmit, setValue, errors } = useForm();
   const [userRepository] = React.useState(new UserRepository());
-  const [showLoading, setShowLoading] = React.useState(false);
+  const [showLoading, setShowLoading] = React.useState(true);
+  const [showSpinner, setShowSpinner] = React.useState(false);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
-  const login = async (data: any) => {
-    console.log('Iniciar sesion', data);
-    setShowLoading(true);
-    const resp = await userRepository.getUserByLogin(data.mail, data.password);
-    console.log('RESPUESTA', resp);
-    console.log(resp ? 'Se inició' : 'falló');
-    setShowLoading(false);
+  const validMail = async (value: any) => {
+    console.log(value);
+    const users = await userRepository.findByMail(value);
+    if (users && users.length > 0) {
+      return false;
+    }
+    return true;
+  };
+
+  const Register = async (data: any) => {
+    setShowSpinner(true);
+    try {
+      const users = await userRepository.findByMail(data.mail);
+      console.log(users);
+      if (users && users.length > 0) {
+        setShowSpinner(false);
+      } else {
+        setShowLoading(true);
+        await userRepository.onCreate(data);
+        setShowLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   if (showLoading) {
@@ -43,6 +67,15 @@ export default function Login({ navigation }: any) {
           backgroundColor: 'white',
         }}
       >
+        {showSpinner ? (
+          <ActivityIndicator
+            style={{ ...StyleSheet.absoluteFillObject, zIndex: 9999 }}
+            size='large'
+            color={Colors.secundary}
+          />
+        ) : (
+          <View />
+        )}
         <View style={styles.banner}>
           <View style={StylesGeneral.containerPrincipal}>
             <Text
@@ -75,18 +108,39 @@ export default function Login({ navigation }: any) {
           />
           <View style={styles.containerForm}>
             <View style={StylesGeneral.containerForm}>
-              <TouchableHighlight
-                style={{ position: 'absolute', left: 10, top: 10, zIndex: 100 }}
-                onPress={()=>{navigation.navigate(RouterNavs.REGISTER)}}
-              >
-                <Text style={StylesGeneral.link}>Regístrate</Text>
-              </TouchableHighlight>
-              <Text style={StylesGeneral.title}>Iniciar sesión</Text>
+              <Text style={StylesGeneral.title}>Regístrate en eureka!</Text>
               <View style={[StylesGeneral.conatinerInput, { marginTop: 30 }]}>
                 <Controller
                   control={control}
-                  name='mail'
+                  name='name'
                   rules={{ required: true }}
+                  defaultValue=''
+                  render={({ onChange, onBlur, value }: any) => (
+                    <TextInput
+                      style={
+                        errors.name
+                          ? StylesGeneral.textInputLoginError
+                          : StylesGeneral.textInputLogin
+                      }
+                      placeholderTextColor={Colors.placeholder}
+                      placeholder='Nombre'
+                      onBlur={onBlur}
+                      onChangeText={(value) => onChange(value)}
+                      value={value}
+                    />
+                  )}
+                />
+                <FontAwesome
+                  name='user'
+                  size={32}
+                  style={StylesGeneral.iconInputLogin}
+                />
+              </View>
+              <View style={StylesGeneral.conatinerInput}>
+                <Controller
+                  control={control}
+                  name='mail'
+                  rules={{ required: true, validate: async value =>  await validMail(value) }}
                   defaultValue=''
                   render={({ onChange, onBlur, value }: any) => (
                     <TextInput
@@ -95,6 +149,7 @@ export default function Login({ navigation }: any) {
                           ? StylesGeneral.textInputLoginError
                           : StylesGeneral.textInputLogin
                       }
+                      textContentType='emailAddress'
                       placeholderTextColor={Colors.placeholder}
                       placeholder='Correo electrónico'
                       onBlur={onBlur}
@@ -165,23 +220,30 @@ export default function Login({ navigation }: any) {
               </View>
 
               <TouchableHighlight
-                style={{ marginTop: 20 }}
-                underlayColor='transparent'
-              >
-                <Text style={StylesGeneral.link}>Olvidaste tu contraseña</Text>
-              </TouchableHighlight>
-
-              <TouchableHighlight
                 style={[styles.btnLogin, { marginTop: 60 }]}
-                onPress={handleSubmit(login)}
+                onPress={handleSubmit(Register)}
                 underlayColor='transparent'
               >
                 <Text
                   style={{ color: Colors.white, fontFamily: 'Roboto-Bold' }}
                 >
-                  Iniciar sesión
+                  Regístrate
                 </Text>
               </TouchableHighlight>
+
+              <View style={{ marginTop: 20, flexDirection: 'row' }}>
+                <Text style={StylesGeneral.text}>
+                  ¿Ya tienes una cuenta de usuario?{' '}
+                </Text>
+                <TouchableHighlight
+                  onPress={() => {
+                    navigation.navigate(RouterNavs.LOGIN);
+                  }}
+                  underlayColor='transparent'
+                >
+                  <Text style={StylesGeneral.link}>Iniciar sesión</Text>
+                </TouchableHighlight>
+              </View>
             </View>
           </View>
         </View>
@@ -196,14 +258,14 @@ const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   banner: {
     backgroundColor: Colors.light,
-    borderBottomLeftRadius: 75,
+    borderBottomRightRadius: 75,
     height: '20%',
   },
   containerForm: {
     flex: 1,
     borderBottomRightRadius: 75,
     borderBottomLeftRadius: 75,
-    borderTopRightRadius: 75,
+    borderTopLeftRadius: 75,
     backgroundColor: Colors.white,
   },
   footer: {
