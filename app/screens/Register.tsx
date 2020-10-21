@@ -3,7 +3,7 @@ import {
   MaterialIcons,
   MaterialCommunityIcons,
 } from '@expo/vector-icons';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -25,7 +25,7 @@ import Loading from './Loading';
 export default function Register({ navigation }: any) {
   const { control, handleSubmit, setValue, errors } = useForm();
   const [userRepository] = React.useState(new UserRepository());
-  const [showLoading, setShowLoading] = React.useState(true);
+  const [showLoading, setShowLoading] = React.useState(false);
   const [showSpinner, setShowSpinner] = React.useState(false);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
@@ -51,7 +51,7 @@ export default function Register({ navigation }: any) {
         setShowLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -74,7 +74,7 @@ export default function Register({ navigation }: any) {
             color={Colors.secundary}
           />
         ) : (
-          <View />
+          <Fragment />
         )}
         <View style={styles.banner}>
           <View style={StylesGeneral.containerPrincipal}>

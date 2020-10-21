@@ -1,17 +1,27 @@
 import {
   FontAwesome,
-  MaterialIcons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from '@expo/vector-icons';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Dimensions, StyleSheet, Text, TouchableHighlight } from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+} from 'react-native';
 import { View } from 'react-native-animatable';
 import { TextInput } from 'react-native-gesture-handler';
-import { color } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-navigation';
+import { connect, useDispatch } from 'react-redux';
 import RouterNavs from '../constants/Routes';
 import UserRepository from '../firebase/Reposirties/UserRepository';
+import {
+  authenticationSaveMail,
+  authenticationSaveToken,
+} from '../redux/authentication/AuthenticationDuck';
 import Colors from '../styles/Colors';
 import StylesGeneral from '../styles/General';
 import Loading from './Loading';
@@ -21,14 +31,28 @@ export default function Login({ navigation }: any) {
   const [userRepository] = React.useState(new UserRepository());
   const [showLoading, setShowLoading] = React.useState(false);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+  const [showSpinner, setShowSpinner] = React.useState(false);
+  const dispatch = useDispatch();
 
   const login = async (data: any) => {
-    console.log('Iniciar sesion', data);
-    setShowLoading(true);
-    const resp = await userRepository.getUserByLogin(data.mail, data.password);
-    console.log('RESPUESTA', resp);
-    console.log(resp ? 'Se inició' : 'falló');
-    setShowLoading(false);
+    setShowSpinner(true);
+    try {
+      const resp = await userRepository.getUserByLogin(
+        data.mail,
+        data.password
+      );
+      if (resp) {
+        setShowSpinner(false);
+        setShowLoading(true);
+        setTimeout(() => {
+          setShowLoading(false);
+          dispatch(authenticationSaveMail(resp.mail));
+          dispatch(authenticationSaveToken('true'));
+        }, 3000);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (showLoading) {
@@ -43,6 +67,15 @@ export default function Login({ navigation }: any) {
           backgroundColor: 'white',
         }}
       >
+        {showSpinner ? (
+          <ActivityIndicator
+            style={{ ...StyleSheet.absoluteFillObject, zIndex: 9999 }}
+            size='large'
+            color={Colors.secundary}
+          />
+        ) : (
+          <Fragment />
+        )}
         <View style={styles.banner}>
           <View style={StylesGeneral.containerPrincipal}>
             <Text
@@ -77,7 +110,9 @@ export default function Login({ navigation }: any) {
             <View style={StylesGeneral.containerForm}>
               <TouchableHighlight
                 style={{ position: 'absolute', left: 10, top: 10, zIndex: 100 }}
-                onPress={()=>{navigation.navigate(RouterNavs.REGISTER)}}
+                onPress={() => {
+                  navigation.navigate(RouterNavs.REGISTER);
+                }}
               >
                 <Text style={StylesGeneral.link}>Regístrate</Text>
               </TouchableHighlight>
