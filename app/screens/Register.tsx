@@ -30,7 +30,6 @@ export default function Register({ navigation }: any) {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
 
   const validMail = async (value: any) => {
-    console.log(value);
     const users = await userRepository.findByMail(value);
     if (users && users.length > 0) {
       return false;
@@ -42,7 +41,6 @@ export default function Register({ navigation }: any) {
     setShowSpinner(true);
     try {
       const users = await userRepository.findByMail(data.mail);
-      console.log(users);
       if (users && users.length > 0) {
         setShowSpinner(false);
       } else {
