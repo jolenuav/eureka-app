@@ -1,7 +1,7 @@
 import {
   FontAwesome,
-  MaterialIcons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from '@expo/vector-icons';
 import React, { Fragment } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -14,10 +14,11 @@ import {
 } from 'react-native';
 import { View } from 'react-native-animatable';
 import { TextInput } from 'react-native-gesture-handler';
-import { color } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-navigation';
+import { useDispatch } from 'react-redux';
 import RouterNavs from '../constants/Routes';
 import UserRepository from '../firebase/Reposirties/UserRepository';
+import { authenticationSaveMail, authenticationSaveToken } from '../redux/authentication/AuthenticationDuck';
 import Colors from '../styles/Colors';
 import StylesGeneral from '../styles/General';
 import Loading from './Loading';
@@ -28,6 +29,7 @@ export default function Register({ navigation }: any) {
   const [showLoading, setShowLoading] = React.useState(false);
   const [showSpinner, setShowSpinner] = React.useState(false);
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+  const dispatch = useDispatch();
 
   const validMail = async (value: any) => {
     const users = await userRepository.findByMail(value);
@@ -38,18 +40,24 @@ export default function Register({ navigation }: any) {
   };
 
   const Register = async (data: any) => {
+    console.log(data);
     setShowSpinner(true);
     try {
       const users = await userRepository.findByMail(data.mail);
+      console.log(users);
       if (users && users.length > 0) {
         setShowSpinner(false);
       } else {
+        setShowSpinner(false);
         setShowLoading(true);
-        await userRepository.onCreate(data);
-        setShowLoading(false);
+        setTimeout(() => {
+          setShowLoading(false);
+          dispatch(authenticationSaveMail(data.mail));
+          dispatch(authenticationSaveToken('true'));
+        }, 3000);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
@@ -138,7 +146,10 @@ export default function Register({ navigation }: any) {
                 <Controller
                   control={control}
                   name='mail'
-                  rules={{ required: true, validate: async value =>  await validMail(value) }}
+                  rules={{
+                    required: true,
+                    validate: async (value) => await validMail(value),
+                  }}
                   defaultValue=''
                   render={({ onChange, onBlur, value }: any) => (
                     <TextInput
