@@ -9,9 +9,13 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { SharedElement } from 'react-navigation-shared-element';
+import RouterNavs from '../constants/Routes';
 import Colors from '../styles/Colors';
 import StylesGeneral from '../styles/General';
 import CafeDolceSvg from '../svg/CafeDolceSvg';
@@ -38,6 +42,7 @@ export const BottomSheet = () => {
       paddingHorizontal: 24,
       position: 'absolute',
       right: 0,
+      zIndex: 2,
     },
     containerIndicador: {
       alignItems: 'center',
@@ -58,6 +63,7 @@ export const BottomSheet = () => {
       width: 80,
     },
   });
+  let [indexOpacity, setIndexOpacity] = React.useState(-10);
   const animateOut = () => {
     Animated.timing(backdropOpacity, {
       useNativeDriver: true,
@@ -80,8 +86,6 @@ export const BottomSheet = () => {
   };
   const backdropOpacity = new Animated.Value(0);
   const cardBottom = new Animated.Value(height - 100);
-  const initV = 0;
-  const endV = 0;
   const panResponse = PanResponder.create({
     onMoveShouldSetPanResponder: (_, gestureState) => {
       return true;
@@ -113,6 +117,7 @@ export const BottomSheet = () => {
             ...StyleSheet.absoluteFillObject,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             opacity: backdropOpacity,
+            zIndex: indexOpacity,
           }}
         ></Animated.View>
       </TouchableWithoutFeedback>
@@ -188,9 +193,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Home() {
+export default function Home({ navigation }: any) {
   const { control, handleSubmit, setValue, errors } = useForm();
   const [location, setLocation] = React.useState('Ubicación actual');
+  const item = { id: 'user' };
   // ANIMATIONS
   const animatedIcon1 = new Animated.Value(0);
   const animatedIcon2 = new Animated.Value(0);
@@ -290,7 +296,14 @@ export default function Home() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Feather name='user' size={30} color={Colors.white} />
+        <TouchableOpacity
+          style={{ zIndex: 1000 }}
+          onPress={() => navigation.navigate(RouterNavs.PROFILE_USER, { item })}
+        >
+          <SharedElement id={item.id}>
+            <Feather name='user' size={30} color={Colors.white} />
+          </SharedElement>
+        </TouchableOpacity>
         <View style={styles.location}>
           <Text
             style={[

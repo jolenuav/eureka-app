@@ -15,7 +15,7 @@ import {
 import { View } from 'react-native-animatable';
 import { TextInput } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-navigation';
-import { connect, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import RouterNavs from '../constants/Routes';
 import UserRepository from '../firebase/Reposirties/UserRepository';
 import {

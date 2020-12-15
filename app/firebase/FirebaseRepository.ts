@@ -1,11 +1,15 @@
-
-import { firebase } from "./FirebaseConfig";
+import { firebaseConfig } from './FirebaseConfig';
+import * as firebase from 'firebase';
+import 'firebase/firestore';
 
 export default class FirestoreRepository {
   // Connection
   collection: any;
 
   constructor(collection: string) {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     this.collection = firebase.firestore().collection(collection);
   }
 

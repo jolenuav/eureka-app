@@ -18,7 +18,10 @@ import { SafeAreaView } from 'react-navigation';
 import { useDispatch } from 'react-redux';
 import RouterNavs from '../constants/Routes';
 import UserRepository from '../firebase/Reposirties/UserRepository';
-import { authenticationSaveMail, authenticationSaveToken } from '../redux/authentication/AuthenticationDuck';
+import {
+  authenticationSaveMail,
+  authenticationSaveToken,
+} from '../redux/authentication/AuthenticationDuck';
 import Colors from '../styles/Colors';
 import StylesGeneral from '../styles/General';
 import Loading from './Loading';

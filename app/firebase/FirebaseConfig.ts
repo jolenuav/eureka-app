@@ -1,7 +1,7 @@
-import * as firebase from 'firebase';
-import 'firebase/firestore'
+// import * as firebase from 'firebase';
+// import 'firebase/firestore'
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: 'AIzaSyDWgfvsxueWiCouxreeZ3H-O6aghl0wgMs',
   authDomain: 'jh-ui-a4bf8.firebaseapp.com',
   databaseURL: 'https://jh-ui-a4bf8.firebaseio.com',
@@ -12,6 +12,6 @@ const firebaseConfig = {
   measurementId: 'G-7508LQJM0N',
 };
 
-firebase.initializeApp(firebaseConfig);
+// firebase.initializeApp(firebaseConfig);
 
-export { firebase };
+// export { firebase };
